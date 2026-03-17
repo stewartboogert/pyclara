@@ -1,4 +1,7 @@
-from impactx import elements as _elements
+try :
+    from impactx import elements as _elements
+except ImportError:
+    print("impactx not found, cannot convert yaml to impactx line")
 
 import numpy as _np
 
