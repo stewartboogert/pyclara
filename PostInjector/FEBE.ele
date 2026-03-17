@@ -1,0 +1,57 @@
+&global_settings
+	inhibit_fsync = 0
+	mpi_io_read_buffer_size = 16777216
+	mpi_io_write_buffer_size = 16777216
+	usleep_mpi_io_kludge = 0
+	mpi_io_force_file_sync = 0
+&end
+&run_setup
+	lattice = FEBE.lte
+	use_beamline = FEBE
+	centroid = %s.cen
+	sigma = %s.sig
+	losses = %s.loss
+	default_order = 3
+	p_central = 68.82781666683131
+	always_change_p0 = 1
+	s_start = 3.29693
+&end
+&run_control
+	n_steps = 1
+	n_passes = 1
+&end
+&twiss_output
+	filename = %s.twi
+	matched = 0
+	output_at_each_step = 0
+	statistics = 1
+	radiation_integrals = 1
+	beta_x = 5.501361275383869
+	alpha_x = 3.595392676114404
+	eta_x = -0.00014271245428048744
+	etap_x = 0.00012094635638438881
+	beta_y = 5.508068317589207
+	alpha_y = 3.5959660804959874
+	eta_y = -0.00014271245428048744
+	etap_y = 0.00012094635638438881
+&end
+&floor_coordinates
+	filename = %s.flr
+	X0 = 0.0
+	Z0 = 3.29693
+	theta0 = 0.0
+	magnet_centers = 0
+&end
+&matrix_output
+	full_matrix_only = 0
+	SDDS_output = %s.mat
+	SDDS_output_order = 2
+&end
+&sdds_beam
+	input = FEBE_input.sdds
+	reuse_bunch = 1
+	sample_interval = 1
+	center_arrival_time = 0
+&end
+&track
+&end
