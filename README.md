@@ -21,8 +21,8 @@ Injector → Linac → Compression → Transport → Plasma (FBPIC)
 
 ### Tools used
 
-- Elegant — beam tracking through linac and beamline
 - ASTRA — injector modelling (optional)
+- Elegant — beam tracking through linac and beamline
 - FBPIC — plasma wakefield simulation
 - Python — data processing and analysis
 
