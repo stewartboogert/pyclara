@@ -50,7 +50,7 @@ def yaml2acccoords(yaml_dict = None,
         if type != 'dipole' :
             s_delta.append(_np.linalg.norm(centre_delta))
         else :
-            print("dipole")
+            # print("dipole")
             angle = e['angle']
             s_delta.append(_np.linalg.norm(centre_delta))
 
@@ -63,7 +63,7 @@ def yaml2acccoords(yaml_dict = None,
             s_centre.append(s_centre[-1]+s_delta[-1])
             s_end.append(s_centre[-1]+s_delta[-1]+length/2)
 
-        print(k, type, length, angle, s_centre[-1])
+        # print(k, type, length, angle, s_centre[-1])
 
         # update centre old for next iteration
         centre_old = centre

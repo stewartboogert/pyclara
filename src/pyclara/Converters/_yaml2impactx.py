@@ -3,7 +3,7 @@ try :
 except ImportError:
     print("impactx not found, cannot convert yaml to impactx line")
 
-import numpy as _np
+from ._yaml2acccoords import yaml2acccoords
 
 def loadyaml(filename):
     import yaml
@@ -16,17 +16,14 @@ def yaml2impactx(yaml_dict = None, start_element = "CLA-FEA-MAG-QUAD-13", end_el
 
     yaml_elements = yaml_dict['elements']
 
-    d = _elements.Drift(name="line", ds=200)
-    q = _elements.Quad(name="q1", ds=1, k=5)
+    s_start, s_centre, s_end = yaml2acccoords(yaml_dict, start_element, end_element)
 
-    ix_line = []
+    ix_converted = []
+    ix_idx = []
 
     converting = False
-    first = True
-    old_pos = [0,0,0]
 
-    s_delta = []
-
+    i = 0
     for k in yaml_elements.keys():
 
         e = yaml_elements[k]
@@ -36,32 +33,38 @@ def yaml2impactx(yaml_dict = None, start_element = "CLA-FEA-MAG-QUAD-13", end_el
         if k == start_element:
             converting = True
 
-        if k == end_element:
-            converting = False
-
         if not converting:
             continue
 
-        if first :
-            first = False
-            old_pos = e['centre']
+        if k == end_element:
+            converting = False
 
-        if t == 'drift':
-            ix_e = _elements.Drift(name=k, ds=l)
-            ix_line.append(ix_e)
-        elif t == 'quadrupole':
-            ix_e = _elements.Quad(name=k, ds=l, k=e['k1l']/l)
-            ix_line.append(ix_e)
+        ix_e = None
+
+        if t == 'quadrupole':
+            ix_e = _elements.Quad(name=k, ds=l, k=e['k1l']/l) # TODO not sure about this division as the ks look large
+            ix_idx.append(i)
         else :
             pass
 
-        ds = (_np.array(e['centre'])-_np.array(old_pos))[2]
-        print(ds)
+        if ix_e is not None :
+            ix_converted.append(ix_e)
 
-        s_delta.append((_np.array(e['centre'])-_np.array(old_pos))[2])
+        i += 1
 
-        old_pos = e['centre']
+    # line
+    ix_line = []
 
+    # make drifts
+    for i in range(0,len(ix_converted)) :
+        name = "drift_"+str(i)
+        ix_line.append(ix_converted[i])
+        try :
+            ix_line.append(_elements.Drift(name=name, ds=s_start[ix_idx[i+1]]-s_end[ix_idx[i]]))
+        except IndexError :
+            pass
+
+    return ix_line
 
 
 
