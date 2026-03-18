@@ -1,0 +1,39 @@
+[project]
+name = "pyclara"
+requires-python = ">=3.9"
+dynamic = ["version"]
+readme = "README.md"
+description = "Python utilities for CLARA users"
+#licence = {file = "LICENCE.txt"}
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Developers",
+    "Intended Audience :: Science/Research",
+    "Operating System :: MacOS",
+    "Operating System :: POSIX",
+    "Operating System :: Unix",
+    "Programming Language :: Python",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Topic :: Scientific/Engineering",
+    "Topic :: Scientific/Engineering :: Physics",
+    "Topic :: Software Development"
+    ]
+authors = [
+  {name = "Stewart Boogert", email = "stewart.boogert@cockcroft.ac.uk"}
+]
+maintainers = [
+  {name = "Stewart Boogert", email = "stewart.boogert@cockcroft.ac.uk"}
+]
+dependencies = [
+]
+
+[project.optional-dependencies]
+dev = ["pytest", "sphinx", "sphinx-rtd-theme"]
+
+[build-system]
+requires = ["setuptools","setuptools_scm"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools_scm]
+write_to = "src/pyclara/_version.py"
