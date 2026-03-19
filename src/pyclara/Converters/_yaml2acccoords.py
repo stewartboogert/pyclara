@@ -43,16 +43,21 @@ def yaml2acccoords(yaml_dict = None,
         length = _np.array(e['length'])
         angle = 0
 
-
-        # difference in centres
-        centre_delta = centre - centre_old
+        start = _np.array([0,0,0])
+        centre_delta = _np.array([0,0,0])
+        end = _np.array([0,0,0])
 
         if type != 'dipole' :
+            centre_delta = centre - centre_old
+            start = centre - centre_delta/2
+            end = centre + centre_delta/2
             s_delta.append(_np.linalg.norm(centre_delta))
         else :
             # print("dipole")
             angle = e['angle']
+            centre_delta = centre - centre_old
             s_delta.append(_np.linalg.norm(centre_delta))
+
 
         if len(s_centre) == 0 :
             s_start.append(-length/2)
