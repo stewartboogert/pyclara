@@ -19,9 +19,9 @@ def yaml2acccoords(yaml_dict = None,
     first = True
     converting = False
 
-    centre_old = _np.array([0,0,0])
 
     for k in yaml_elements.keys():
+
         if k == start_element:
             converting = True
 
@@ -60,8 +60,8 @@ def yaml2acccoords(yaml_dict = None,
             s_end.append(length/2)
         else :
             s_start.append(s_centre[-1]+s_delta[-1]-length/2)
-            s_centre.append(s_centre[-1]+s_delta[-1])
             s_end.append(s_centre[-1]+s_delta[-1]+length/2)
+            s_centre.append(s_centre[-1]+s_delta[-1])
 
         # print(k, type, length, angle, s_centre[-1])
 
