@@ -64,7 +64,7 @@ def yaml2impactx(yaml_dict = None, start_element = "CLA-FEA-MAG-QUAD-13", end_el
         except IndexError :
             pass
 
-    return ix_line
+    return ix_line, ix_idx
 
 
 
