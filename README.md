@@ -73,8 +73,8 @@ betax = array(d.getColumnValueList("betax"))[array(d.getColumnValueList('Element
 print(betax)
 
 ```
-The twi file of the PostInjector optics ```FEBE.twi``` has been placed in the 
-PostInjector directory for convvenience
+The twi and sig files of the PostInjector optics ```FEBE.twi``` and ```FEBE.sig``` has been placed in the 
+Output directory for convvenience
 
 ## Apptainer/docker elegant 
 
