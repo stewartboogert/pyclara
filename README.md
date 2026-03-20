@@ -50,5 +50,33 @@ pip install -e .
 mkdir Run
 cd Run
 ln -s ../PostInjector/* .
-mpich -np #number_cores Pelegant FEBE.ele 
+mpiexec -np #number_cores Pelegant FEBE.ele 
 ```
+The output files can be read using python (you need to have
+sdds installed, e.g. `pip install sdds`):
+
+```bash
+ipython
+import sdds
+
+d = sdds.SDDS('FEBE.twi')
+
+# making a standard optics plot 
+subplot(2,1,1)
+plot(d.getColumnValueList('s'),d.getColumnValueList('betax'))
+plot(d.getColumnValueList('s'),d.getColumnValueList('betay'))
+subplot(2,1,1)
+plot(d.getColumnValueList('s'),d.getColumnValueList('etax'))
+plot(d.getColumnValueList('s'),d.getColumnValueList('etay'))
+
+# getting twiss parameters at a named element (e.g betax at CLA-FED-DIA-BPM-01-DRIFT-02
+betax = array(d.getColumnValueList("betax"))[array(d.getColumnValueList('ElementName')) == 'CLA-FED-DIA-BPM-01-DRIFT-02']
+print(betax)
+
+```
+The twi file of the PostInjector optics ```FEBE.twi``` has been placed in the 
+PostInjector directory for convvenience
+
+## Apptainer/docker elegant 
+
+If you do not have elegant installed. There is an appaineter image available
