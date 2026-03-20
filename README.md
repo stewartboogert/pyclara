@@ -79,3 +79,16 @@ Output directory for convvenience
 ## Apptainer/docker elegant 
 
 If you do not have elegant installed. There is an appaineter image available
+
+## Converting optics 
+
+For example from elegant to ImpactX. Move to the PostInjector directory and run 
+
+```python
+import pyclara
+import yaml
+
+f = open("lattice.yaml")
+d = yaml.safe_load(f)
+l = pyclara.Converters.yaml2impactx(d)
+```
