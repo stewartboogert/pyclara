@@ -26,6 +26,7 @@ maintainers = [
   {name = "Stewart Boogert", email = "stewart.boogert@cockcroft.ac.uk"}
 ]
 dependencies = [
+  "soliday.sdds"
 ]
 
 [project.optional-dependencies]

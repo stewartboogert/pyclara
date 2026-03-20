@@ -56,16 +56,15 @@ The output files can be read using python (you need to have
 sdds installed, e.g. `pip install sdds`):
 
 ```bash
-ipython
 import sdds
 
-d = sdds.SDDS('FEBE.twi')
+d = sdds.load('FEBE.twi')
 
 # making a standard optics plot 
 subplot(2,1,1)
 plot(d.getColumnValueList('s'),d.getColumnValueList('betax'))
 plot(d.getColumnValueList('s'),d.getColumnValueList('betay'))
-subplot(2,1,1)
+subplot(2,1,2)
 plot(d.getColumnValueList('s'),d.getColumnValueList('etax'))
 plot(d.getColumnValueList('s'),d.getColumnValueList('etay'))
 
