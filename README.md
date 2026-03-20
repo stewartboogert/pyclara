@@ -1,23 +1,15 @@
 # Start-to-End-S2E-simulation-for-CLARA-FEBE
 
-## 📌 Overview
+## Overview
 
-This repository contains a full **Start-to-End (S2E) simulation pipeline** for beam dynamics at the CLARA FEBE beamline, developed at CLARA.
+This repository contains a full **Start-to-End (S2E) simulation pipeline** for beam 
+dynamics at the CLARA-FEBE beamline
 
-The workflow connects conventional accelerator tracking codes with plasma simulation tools to study **beam-driven plasma wakefield acceleration (PWFA)** using realistic electron beam distributions.
+The workflow connects conventional accelerator tracking codes with plasma simulation 
+tools to study **beam-driven plasma wakefield acceleration (PWFA)** using realistic 
+electron beam distributions.
 
 ---
-
-## 🧠 Objectives
-
-- Simulate electron beam evolution from injector to plasma stage
-- Simulate PWFA and LWFA process
-- Compare realistic beam distributions with idealised Gaussian beams
-
-- ## 🧩 Simulation Pipeline
-
-The S2E workflow consists of:
-Injector → Linac → Compression → Transport → Plasma (FBPIC)
 
 ### Tools used
 
@@ -25,29 +17,38 @@ Injector → Linac → Compression → Transport → Plasma (FBPIC)
 - Elegant — beam tracking through linac and beamline
 - FBPIC — plasma wakefield simulation
 - Python — data processing and analysis
+- Simframe — ASTeC base model description
 
-## 📁 Repository Structure
+## Repository Structure
 
 ```text
 clara-s2e/
 │
-├── elegant/          # lattice files and beam generation
-├── conversion/       # SDDS → HDF5 conversion scripts
-├── fbpic/            # plasma simulation scripts
-├── analysis/         # post-processing and diagnostics
-├── figures/          # generated plots
-├── docs/             # simulation logs and notes
-│
-├── requirements.txt
+├── Info/             # project overview and documentation
+├── Injector/         # ASTRA injector simulations
+├── Output/           # simulation results and data
+├── PostInjector/     # Simframe and Elegant input files
+├── src/              # python project source code 
 └── README.md
 
 ---
 ```
 
-## ⚙️ Installation
+## Installation
 
 Clone the repository:
 
 ```bash
-git clone https://github.com/your-username/clara-s2e.git
+git clone https://github.com/Shuyan0224/Start-to-End-S2E-simulation-for-CLARA-FEBE.git clara-s2e
 cd clara-s2e
+pip install -e .
+```
+
+## Running elegant 
+
+```bash 
+mkdir Run
+cd Run
+ln -s ../PostInjector/* .
+mpich -np #number_cores Pelegant FEBE.ele 
+```
