@@ -19,7 +19,8 @@ def elegant2xsuite(elegant_file,
 
     # load elegant twiss file if provided
     if elegant_twi is not None :
-        twi = _sdds.load(elegant_twi)
+        if isinstance(elegant_twi, str) :
+            elegant_twi = _sdds.load(elegant_twi)
 
     # create xsuite environment
     env = _xtrack.Environment()
@@ -71,12 +72,43 @@ def elegant2xsuite(elegant_file,
     line_componenet_names = [e.upper() for e in lte[line_name]['LINE']]
 
     # create line
-    env.new_line(name = line_name,
-                 components = line_componenet_names)
+    xt_line = env.new_line(name = line_name,
+                           components = line_componenet_names)
 
     # add twiss to environment if provided
     if elegant_twi is not None :
-        pass
+        p0 = elegant_twi.getColumnValueList('pCentral0')[0]
+        betax = elegant_twi.getColumnValueList('betax')[0]
+        alphax = elegant_twi.getColumnValueList('alphax')[0]
+        etax = elegant_twi.getColumnValueList('etax')[0]
+        etaxp = elegant_twi.getColumnValueList('etaxp')[0]
 
-    return env
+        betay = elegant_twi.getColumnValueList('betay')[0]
+        alphay = elegant_twi.getColumnValueList('alphay')[0]
+        etay = elegant_twi.getColumnValueList('etay')[0]
+        etayp = elegant_twi.getColumnValueList('etayp')[0]
+
+        print(p0)
+        print(betax, alphax, etax, etaxp)
+        print(betay, alphay, etay, etayp)
+
+
+        xtrack_twiss0 = _xtrack.TwissInit(betx = betax,
+                                          alfx = alphax,
+                                          dx = etax,
+                                          dpx = etaxp,
+                                          bety = betay,
+                                          alfy = alphay,
+                                          dy = etay,
+                                          dpy = etayp)
+
+        xt_line.set_particle_ref(pdg_id_0=11,
+                                 p0c = 0.51099895069*p0)
+
+        xtrack_twiss = xt_line.twiss(method="6d",
+                                     init=xtrack_twiss0)
+
+
+
+    return env, xtrack_twiss0, xtrack_twiss
 
