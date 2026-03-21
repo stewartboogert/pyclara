@@ -22,16 +22,22 @@ def All(elegant_twi) :
     Energy(elegant_twi)
 
 
+def Machine(elegant_ele, vertical_stack = False) :
+    pass
+
 def Beta(elegant_twi, vertical_stack = False) :
     if isinstance(elegant_twi, str) :
         elegant_twi = _sdds.load(elegant_twi)
 
-    s = elegant_twi.getColumnValueList('s')
-    betax = elegant_twi.getColumnValueList('betax')
-    betay = elegant_twi.getColumnValueList('betay')
+    s = _np.array(elegant_twi.getColumnValueList('s'))
+    betax = _np.array(elegant_twi.getColumnValueList('betax'))
+    betay = _np.array(elegant_twi.getColumnValueList('betay'))
 
-    _plt.plot(s,betax, label=r'$\beta_x$')
-    _plt.plot(s,betay, label=r'$\beta_y$')
+    # remove any offset in s
+    s = s - s[0]
+
+    _plt.plot(s,betax, label=r'Elegant $\beta_x$')
+    _plt.plot(s,betay, label=r'Elegant $\beta_y$')
 
     if vertical_stack :
         _plt.xlabel('')
@@ -49,8 +55,8 @@ def Alpha(elegant_twi, vertical_stack = False) :
     alphax = elegant_twi.getColumnValueList('alphax')
     alphay = elegant_twi.getColumnValueList('alphay')
 
-    _plt.plot(s,alphax, label=r'$\alpha_x$')
-    _plt.plot(s,alphay, label=r'$\alpha_y$')
+    _plt.plot(s,alphax, label=r'Elegant $\alpha_x$')
+    _plt.plot(s,alphay, label=r'Elegant $\alpha_y$')
 
     if vertical_stack :
         _plt.xlabel('')
@@ -69,8 +75,8 @@ def Psi(elegant_twi, vertical_stack = False) :
     psix = _np.array(elegant_twi.getColumnValueList('psix'))/_np.pi
     psiy = _np.array(elegant_twi.getColumnValueList('psiy'))/_np.pi
 
-    _plt.plot(s,psix, label=r'$\psi_x [\pi]$')
-    _plt.plot(s,psiy, label=r'$\psi_y [\pi]$')
+    _plt.plot(s,psix, label=r'Elegant $\psi_x [\pi]$')
+    _plt.plot(s,psiy, label=r'Elegant $\psi_y [\pi]$')
 
     if vertical_stack :
         _plt.xlabel('')
@@ -88,8 +94,8 @@ def Eta(elegant_twi, vertical_stack = False) :
     etax = elegant_twi.getColumnValueList('etax')
     etay = elegant_twi.getColumnValueList('etay')
 
-    _plt.plot(s,etax, label=r'$\eta_x$')
-    _plt.plot(s,etay, label=r'$\eta_y$')
+    _plt.plot(s,etax, label=r'Elegant $\eta_x$')
+    _plt.plot(s,etay, label=r'Elegant $\eta_y$')
 
     if vertical_stack :
         _plt.xlabel('')
@@ -114,5 +120,5 @@ def Energy(elegant_twi, vertical_stack = False) :
         _plt.gca().xaxis.set_visible(False)
     else :
         _plt.xlabel("s [m]")
-        _plt.ylabel(r"$\beta\gamma$")
+        _plt.ylabel(r"Elegant $\beta\gamma$")
     _plt.legend()
