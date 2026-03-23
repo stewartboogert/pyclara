@@ -78,7 +78,19 @@ Output directory for convvenience
 
 ## Apptainer/docker elegant 
 
-If you do not have elegant installed. There is an appaineter image available
+If you do not have elegant installed. The is a docker file [here](https://hub.docker.com/r/sboogert/alma9-elegant) and an appaineter image 
+[here](https://github.com/accelerator-codes/elegant-deployment/pkgs/container/alma9-elegant) 
+
+Building the docker image 
+```bash
+docker build --platform linux/amd64 -t alma9-elegant -f Dockerfile-u22 . 
+```
+
+Running elegant in docker 
+```bash
+docker run -t alma9-elegant
+cd /elegant
+```
 
 ## Converting optics 
 
