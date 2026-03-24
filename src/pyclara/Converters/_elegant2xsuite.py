@@ -1,3 +1,8 @@
+import numpy as _np
+from scipy import constants as _constants
+
+m_e_eV = _constants.m_e*_constants.c**2/_constants.electron_volt
+
 import sdds as _sdds
 from ._elegantloader import elegant_lte_loader as _elegant_lte_loader
 
@@ -12,7 +17,8 @@ def elegant2xsuite(elegant_file,
                    line_name = "FEBE",
                    start_element="CLA-FEA-MAG-QUAD-13",
                    end_element="CLA-FED-SIM-DUMP-01-START",
-                   elegant_twi = None) :
+                   elegant_twi = None,
+                   elegant_ps = None) :
 
     # load elegant lattice file
     lte = _elegant_lte_loader(elegant_file)
@@ -94,11 +100,14 @@ def elegant2xsuite(elegant_file,
             adding = False
 
     # create line
-    xt_line = env.new_line(name = line_name,
-                           components = subline_component_names)
+    xtrack_line = env.new_line(name = line_name,
+                               components = subline_component_names)
+    xtrack_twiss0 = None
+    xtrack_twiss = None
+    xtrack_particles = None
 
     # add twiss to environment if provided
-    if elegant_twi is not None :
+    if elegant_twi is not None and elegant_ps is None:
         p0 = elegant_twi.getColumnValueList('pCentral0')[istart]
         betax = elegant_twi.getColumnValueList('betax')[istart]
         alphax = elegant_twi.getColumnValueList('alphax')[istart]
@@ -119,13 +128,45 @@ def elegant2xsuite(elegant_file,
                                           dy = etay,
                                           dpy = etayp)
 
-        xt_line.set_particle_ref(pdg_id_0=11,
-                                 p0c = 0.51099895069*p0)
+        xtrack_line.set_particle_ref(pdg_id_0=11,
+                                     p0c = m_e_eV*p0)
 
-        xtrack_twiss = xt_line.twiss(method="4d",
+        xtrack_twiss = xtrack_line.twiss(method="4d",
                                      init=xtrack_twiss0)
 
-        xtrack_track = xt_line.track
+    if elegant_ps is not None and elegant_twi is None:
+        xtrack_particles = elegant2xsuite_particles(elegant_ps, xtrack_line)
+        xtrack_line.track(xtrack_particles)
 
-    return env, xtrack_twiss0, xtrack_twiss
+    return {"env":env,
+            "xtrack_twiss0":xtrack_twiss0,
+            "xtrack_twiss":xtrack_twiss,
+            "xtrack_particles":xtrack_particles}
 
+def elegant2xsuite_particles(elegant_ps, xtrack_line) :
+    if isinstance(elegant_ps, str):
+        elegant_ps = _sdds.load(elegant_ps)
+
+    x = _np.array(elegant_ps.getColumnValueList('x'))
+    y = _np.array(elegant_ps.getColumnValueList('y'))
+    xp = _np.array(elegant_ps.getColumnValueList('xp'))
+    yp = _np.array(elegant_ps.getColumnValueList('yp'))
+    t = _np.array(elegant_ps.getColumnValueList('t'))
+    p = _np.array(elegant_ps.getColumnValueList('p'))
+
+
+    xtrack_line.set_particle_ref(pdg_id_0=11,
+                                 p0c=m_e_eV*p.mean())
+
+    zeta = (t-t.mean())*_constants.c*xtrack_line.particle_ref.beta0[0]
+
+    delta = (p-p.mean())/p.mean()
+
+    particles = xtrack_line.build_particles(x=x,
+                                            xp=xp,
+                                            y=y,
+                                            yp=yp,
+                                            zeta=zeta,
+                                            delta=delta)
+
+    return particles
