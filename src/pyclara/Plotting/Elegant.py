@@ -2,7 +2,54 @@ import sdds as _sdds
 import matplotlib.pyplot as _plt
 import numpy as _np
 
-def All(elegant_twi, start_element = None, end_element = None) :
+def AllPS(elegant_ps) :
+    '''Plot elegant phase space (input and watch'''
+
+    if isinstance(elegant_ps, str) :
+        elegant_ps = _sdds.load(elegant_ps)
+
+    x = _np.array(elegant_ps.getColumnValueList("x"))
+    y = _np.array(elegant_ps.getColumnValueList("y"))
+    xp = _np.array(elegant_ps.getColumnValueList("xp"))
+    yp = _np.array(elegant_ps.getColumnValueList("yp"))
+    t = _np.array(elegant_ps.getColumnValueList("t"))
+    p = _np.array(elegant_ps.getColumnValueList("p"))
+
+    _plt.subplot(3,2,1)
+    _plt.hist(x,50, label=f"{x.std()/1e-3:.3f} [mm]")
+    _plt.xlabel("x [m]")
+    _plt.legend()
+
+    _plt.subplot(3,2,2)
+    _plt.hist(y,50,label=f"{y.std()/1e-3:.3f} [mm]")
+    _plt.xlabel("y [m]")
+    _plt.legend()
+
+    _plt.subplot(3,2,3)
+    _plt.hist(xp,50, label=f"{xp.std()/1e-3:.3f} [mrad]")
+    _plt.xlabel("xp [rad]")
+    _plt.legend()
+
+    _plt.subplot(3,2,4)
+    _plt.hist(yp,50, label=f"{yp.std()/1e-3:.3f} [mrad]")
+    _plt.xlabel("yp [rad]")
+    _plt.legend()
+
+    _plt.subplot(3,2,5)
+    _plt.hist((t-t.mean())/1e-15,50, label=f"{t.std()/1e-15:.3f} [fs]")
+    _plt.xlabel("t [s]")
+    _plt.legend()
+
+    _plt.subplot(3,2,6)
+    _plt.hist(p,50, label=f"{p.std():.3f}")
+    _plt.xlabel("p [βγ]")
+    _plt.legend()
+
+    _plt.tight_layout()
+
+def AllTwi(elegant_twi, start_element = None, end_element = None) :
+    '''Plot elegant twiss (input and watch)'''
+
     if isinstance(elegant_twi, str) :
         elegant_twi = _sdds.load(elegant_twi)
 
