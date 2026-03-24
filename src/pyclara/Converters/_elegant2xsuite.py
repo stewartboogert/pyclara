@@ -110,9 +110,6 @@ def elegant2xsuite(elegant_file,
         etay = elegant_twi.getColumnValueList('etay')[istart]
         etayp = elegant_twi.getColumnValueList('etayp')[istart]
 
-
-        print("Twiss init x : ",betax, alphax, etax, etaxp)
-        print("Twiss init y : ",betay, alphay, etay, etayp)
         xtrack_twiss0 = _xtrack.TwissInit(betx = betax,
                                           alfx = alphax,
                                           dx = etax,
