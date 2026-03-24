@@ -4,5 +4,7 @@ from ._yaml2acccoords import *
 
 from ._elegantloader import *
 from ._elegant2xsuite import *
+from ._elegant2ocelot import *
+
 
 from ._sdds2fbpic import *
