@@ -10,8 +10,6 @@ def sdds2fbpic(sddsfile) :
     pxbeam = xpbeam * pbeam
     pybeam = ypbeam * pbeam
 
-    
-
     return {"x" : xbeam, "y" : ybeam, "xp" : xpbeam, "yp" : ypbeam, "dt" : dtbeam, "p" : pbeam, "px" : pxbeam, "py" : pybeam}
 
     

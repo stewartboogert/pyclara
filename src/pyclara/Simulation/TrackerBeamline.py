@@ -1,4 +1,4 @@
-class Beamline:
+class TrackerBeamline:
 
     def __init__(self, trackers = []):
         self.trackers = trackers
