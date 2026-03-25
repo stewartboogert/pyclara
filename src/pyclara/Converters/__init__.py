@@ -8,5 +8,3 @@ from ._ocelot import *
 from ._rftrack import *
 from ._impactx import *
 from ._bdsim import *
-
-from ._sdds2fbpic import *
