@@ -133,6 +133,15 @@ def elegant2xsuite(elegant_file,
                                           dy = etay,
                                           dpy = etayp)
 
+        dict_twiss0 = {"betx":betax,
+                       "alfx":alphax,
+                       "dx":etax,
+                       "dpx":etaxp,
+                       "bety":betay,
+                       "alfy":alphay,
+                       "dy":etay,
+                       "dpy":etayp}
+
         xtrack_line.set_particle_ref(pdg_id_0=11,
                                      p0c = m_e_eV*p0,
                                      s=s)
@@ -146,6 +155,7 @@ def elegant2xsuite(elegant_file,
 
     return {"env":env,
             "xtrack_twiss0":xtrack_twiss0,
+            "dict_twiss0":dict_twiss0,
             "xtrack_twiss":xtrack_twiss,
             "xtrack_particles":xtrack_particles}
 
