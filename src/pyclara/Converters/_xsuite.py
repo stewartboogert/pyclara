@@ -65,9 +65,10 @@ def elegant2xsuite(elegant_file,
         elif ee['TYPE'] == "MAXAMP" :
             env.elements[ee['NAME']] = _xtrack.Marker()
         elif ee['TYPE'] == 'WATCH':
-            env.elements[ee['NAME']] = _xtrack.ParticlesMonitor(num_particles = 1,
-                                                                start_at_turn=0,
-                                                                stop_at_turn=2)
+            env.elements[ee['NAME']] = _xtrack.Marker()
+            #env.elements[ee['NAME']] = _xtrack.ParticlesMonitor(num_particles = 1,
+            #                                                    start_at_turn=0,
+            #                                                    stop_at_turn=2)
         elif ee['TYPE'] == 'MONI' :
             env.elements[ee['NAME']] = _xtrack.Drift(length=ee['L'])
         elif ee['TYPE'] == "RFCW" :
