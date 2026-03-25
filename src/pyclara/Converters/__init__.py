@@ -10,3 +10,5 @@ from ._impactx import *
 from ._bdsim import *
 
 from ._sdds2fbpic import *
+
+from ._fbpic2sdds import *
