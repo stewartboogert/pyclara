@@ -4,7 +4,7 @@ from scipy import constants as _constants
 m_e_eV = _constants.m_e*_constants.c**2/_constants.electron_volt
 
 import sdds as _sdds
-from ._elegantloader import elegant_lte_loader as _elegant_lte_loader
+from ._elegant import elegant_lte_loader as _elegant_lte_loader
 
 try :
     import xsuite as _xsuite
