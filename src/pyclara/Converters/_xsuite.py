@@ -31,8 +31,11 @@ def elegant2xsuite(elegant_file,
     # create xsuite environment
     env = _xtrack.Environment()
 
+    # loop over elements
     for k in lte :
         ee = lte[k] # elegant element
+
+        # skip over LINE
         if ee['TYPE'].upper() == "LINE":
             continue
 
@@ -83,7 +86,7 @@ def elegant2xsuite(elegant_file,
     if end_element is None or end_element == "":
         end_element = line_component_names[-1]
 
-    # select components
+    # select components within range
     subline_component_names = []
 
     adding = False
