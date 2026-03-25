@@ -47,7 +47,8 @@ def elegant2xsuite(elegant_file,
             env.elements[ee['NAME']] = _xtrack.Drift(length=ee['L'])
         elif ee['TYPE'] == "CSRCSBEND" or ee['TYPE'] == "CSBEND" :
             env.elements[ee['NAME']] = _xtrack.Bend(length=ee['L'],
-                                                    angle=ee['ANGLE'])
+                                                    angle=ee['ANGLE'],
+                                                    edge_entry_model="full")
         elif ee['TYPE'] == 'KQUAD':
             env.elements[ee['NAME']] = _xtrack.Quadrupole(length=ee['L'],
                                                           k1=ee['K1'])
@@ -108,6 +109,7 @@ def elegant2xsuite(elegant_file,
 
     # add twiss to environment if provided
     if elegant_twi is not None and elegant_ps is None:
+        s = elegant_twi.getColumnValueList('s')[istart]
         p0 = elegant_twi.getColumnValueList('pCentral0')[istart]
         betax = elegant_twi.getColumnValueList('betax')[istart]
         alphax = elegant_twi.getColumnValueList('alphax')[istart]
@@ -129,7 +131,8 @@ def elegant2xsuite(elegant_file,
                                           dpy = etayp)
 
         xtrack_line.set_particle_ref(pdg_id_0=11,
-                                     p0c = m_e_eV*p0)
+                                     p0c = m_e_eV*p0,
+                                     s=s)
 
         xtrack_twiss = xtrack_line.twiss(method="4d",
                                      init=xtrack_twiss0)
@@ -170,3 +173,11 @@ def elegant2xsuite_particles(elegant_ps, xtrack_line) :
                                             delta=delta)
 
     return particles
+
+def xsuite2fbpic(particles) :
+    '''Convert xsuite particles to fbpic dict of arrays'''
+    pass
+
+def fbpic2xsuite(fbpic_dict) :
+    '''Convert fbpic dict of particle arrays to xsuite'''
+    pass
