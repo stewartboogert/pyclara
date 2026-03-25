@@ -3,3 +3,13 @@ _version.py
 __pycache__
 Run
 *checkpoint*
+
+# mad8
+*.ps
+*.pdf
+*.txt
+print
+*dict
+
+# bdsim
+*gmad
