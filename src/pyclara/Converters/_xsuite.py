@@ -216,3 +216,14 @@ def xsuite2fbpic(particles) :
 def fbpic2xsuite(fbpic_dict) :
     '''Convert fbpic dict of particle arrays to xsuite'''
     pass
+
+def xsuite_Remove_DriftSlices(line ) :
+    '''Replace DriftSlices for Drifts and create deferred variable'''
+
+    for ename in line.element_names :
+        e = line[ename]
+        if isinstance(e,_xtrack.DriftSlice) :
+            length = e.weight * line[e.parent_name].length
+            line.vars[ename+".L"] = length
+            line.element_dict[ename] = _xtrack.Drift(length=line.vars[ename+".L"]._value)
+            line.element_refs[ename].length = line.vars[ename + ".L"]
