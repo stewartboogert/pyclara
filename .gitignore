@@ -10,6 +10,8 @@ Run
 *.txt
 print
 *dict
+RMAT*
+TWISS*
 
 # bdsim
 *gmad
