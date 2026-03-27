@@ -15,3 +15,11 @@ TWISS*
 
 # bdsim
 *gmad
+
+# plots/notebook output
+*.jpeg
+*.jpg
+*.tiff
+*.pdf
+*.ps
+*.eps
