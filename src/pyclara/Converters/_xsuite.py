@@ -39,43 +39,63 @@ def elegant2xsuite(elegant_file,
         if ee['TYPE'].upper() == "LINE":
             continue
 
+        name = ee['NAME'].replace("-","_")
+
         xe = None
         if ee['TYPE'] == 'CHARGE' :
-            env.elements[ee['NAME']] = _xtrack.Marker()
+            env.new(name, _xtrack.Marker)
         elif ee['TYPE'] == 'DRIFT':
-            env.elements[ee['NAME']] = _xtrack.Drift(length=ee['L'])
+            if ee['L'] == 0 :
+                env.new(name,_xtrack.Marker)
+            else :
+                env[name+".L"] = float(ee['L'])
+                env.new(name, _xtrack.Drift, length = name + ".L")
         elif ee['TYPE'] == 'CSRDRIFT':
-            env.elements[ee['NAME']] = _xtrack.Drift(length=ee['L'])
+            env[name+".L"] = float(ee['L'])
+            env.new(name, _xtrack.Drift, length=name + ".L")
         elif ee['TYPE'] == 'LSCDRIFT':
-            env.elements[ee['NAME']] = _xtrack.Drift(length=ee['L'])
+            env[name+".L"] = float(ee['L'])
+            env.new(name, _xtrack.Drift, length=name + ".L")
         elif ee['TYPE'] == "CSRCSBEND" or ee['TYPE'] == "CSBEND" :
-            env.elements[ee['NAME']] = _xtrack.Bend(length=ee['L'],
-                                                    angle=ee['ANGLE'],
-                                                    edge_entry_model="full")
+            env[name+".L"] = float(ee['L'])
+            env[name+".ANGLE"] = float(ee['ANGLE'])
+            env.new(name, _xtrack.Bend,
+                    length = name+".L", angle = name+".ANGLE")
+
         elif ee['TYPE'] == 'KQUAD':
-            env.elements[ee['NAME']] = _xtrack.Quadrupole(length=ee['L'],
-                                                          k1=ee['K1'])
+            env[name+".L"] = float(ee['L'])
+            env[name+".K1"] = float(ee['K1'])
+            env.new(name, _xtrack.Quadrupole, length=name+".L", k1=name+".K1")
         elif ee['TYPE'] == "KSEXT":
-            env.elements[ee['NAME']] = _xtrack.Sextupole(length=ee['L'],
-                                                         k2=ee['K2'])
+            env[name+".L"] = float(ee['L'])
+            env[name+".K2"] = float(ee['K2'])
+            env.new(name, _xtrack.Sextupole, length=name+".L", k2=name+".K2")
         elif ee['TYPE'] == "KICKER":
-            env.elements[ee['NAME']] = _xtrack.Drift(length=ee['L'])
+            env[name + ".L"] = float(ee['L'])
+            env.new(name, _xtrack.Drift, length=name + ".L")
         elif ee['TYPE'] == "ECOL":
-            env.elements[ee['NAME']] = _xtrack.Drift(length=ee['L'])
+            env[name + ".L"] = float(ee['L'])
+            env.new(name, _xtrack.Drift, length=name + ".L")
         elif ee['TYPE'] == "MAXAMP" :
-            env.elements[ee['NAME']] = _xtrack.Marker()
+            env.new(name, _xtrack.Marker)
         elif ee['TYPE'] == 'WATCH':
-            env.elements[ee['NAME']] = _xtrack.Marker()
-            #env.elements[ee['NAME']] = _xtrack.ParticlesMonitor(num_particles = 1,
-            #                                                    start_at_turn=0,
-            #                                                    stop_at_turn=2)
+            env.new(name,_xtrack.Marker)
         elif ee['TYPE'] == 'MONI' :
-            env.elements[ee['NAME']] = _xtrack.Drift(length=ee['L'])
+            env[name + ".L"] = float(ee['L'])
+            env.new(name, _xtrack.Drift, length=name+".L")
         elif ee['TYPE'] == "RFCW" :
-            env.elements[ee['NAME']] = _xtrack.Cavity(length=ee['L'], voltage=ee['VOLT'],
-                                                      frequency=ee['FREQ'], lag=ee['PHASE'])
+            env[name+".L"] = float(ee['L'])
+            env[name+".VOLT"] = float(ee['VOLT'])
+            env[name+".FREQ"] = float(ee["FREQ"])
+            env[name+".PHAS"] = float(ee["PHASE"])
+            env.new(name, _xtrack.Cavity,
+                    length=name+".L",
+                    voltage=name+".VOLT",
+                    frequency=name+".FREQ",
+                    lag=name+".PHAS")
         elif ee['TYPE'] == "RFDF" :
-            env.elements[ee['NAME']] = _xtrack.Drift(length=ee['L'])
+            env[name+".L"] = float(ee['L'])
+            env.new(name, _xtrack.Drift, length=name+".L")
         else :
             print("element type ", ee['TYPE'], " not recognised, skipping")
 
@@ -99,7 +119,7 @@ def elegant2xsuite(elegant_file,
             istart = i
 
         if adding :
-            subline_component_names.append(e)
+            subline_component_names.append(e.replace("-","_"))
 
         if e == end_element :
             adding = False
@@ -108,6 +128,7 @@ def elegant2xsuite(elegant_file,
     xtrack_line = env.new_line(name = line_name,
                                components = subline_component_names)
     xtrack_twiss0 = None
+    dict_twiss0 = None
     xtrack_twiss = None
     xtrack_particles = None
 
