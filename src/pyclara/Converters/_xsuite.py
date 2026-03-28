@@ -196,6 +196,8 @@ def elegant2xsuite_particles(elegant_ps, xtrack_line) :
     xtrack_line.set_particle_ref(pdg_id_0=11,
                                  p0c=m_e_eV*p.mean())
 
+    px = xp*p # TODO larger angle?
+    py = yp*p # TODO larger angle?
     zeta = (t-t.mean())*_constants.c*xtrack_line.particle_ref.beta0[0]
 
     delta = (p-p.mean())/p.mean()
