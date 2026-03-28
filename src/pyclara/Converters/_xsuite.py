@@ -229,3 +229,38 @@ def xsuite_Remove_DriftSlices(line ) :
             line.vars[ename+".L"] = length
             line.element_dict[ename] = _xtrack.Drift(length=line.vars[ename+".L"]._value)
             line.element_refs[ename].length = line.vars[ename + ".L"]
+
+
+def xsuite_Add_ParticlesMonitor(line, num_particles=10000) :
+    for ename in line.element_names :
+        e = line[ename]
+
+        pm = _xtrack.ParticlesMonitor(num_particles=num_particles,
+                                      start_at_turn=0,
+                                      stop_at_turn=1)
+        line.insert(ename+".PM", pm, at=ename, anchor="end")
+
+def xsuite_CalculateBeamSize(line) :
+
+    beam_sizes = {}
+    beam_sizes['element_names'] = []
+    beam_sizes['n'] = []
+    beam_sizes['s'] = []
+    beam_sizes['x'] = []
+    beam_sizes['px'] = []
+
+    for ename in line.element_names :
+        e = line[ename]
+
+        if isinstance(e,_xtrack.ParticlesMonitor) :
+            beam_sizes['element_names'].append(ename)
+            beam_sizes['s'].append(e.s[0,0])
+            beam_sizes['n'].append(len(e.x[:,0]))
+            beam_sizes['x'].append(e.x[:,0].std())
+            beam_sizes['px'].append(e.px[:,0].std())
+
+    # make numpy arrays
+    for k in beam_sizes.keys() :
+        beam_sizes[k] = _np.array(beam_sizes[k])
+
+    return beam_sizes
