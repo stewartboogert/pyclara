@@ -39,6 +39,7 @@ def elegant2xsuite(elegant_file,
         if ee['TYPE'].upper() == "LINE":
             continue
 
+        # Need to replace any - as xsuite will try to perform a deferred calculation
         name = ee['NAME'].replace("-","_")
 
         xe = None
@@ -61,7 +62,6 @@ def elegant2xsuite(elegant_file,
             env[name+".ANGLE"] = float(ee['ANGLE'])
             env.new(name, _xtrack.Bend,
                     length = name+".L", angle = name+".ANGLE")
-
         elif ee['TYPE'] == 'KQUAD':
             env[name+".L"] = float(ee['L'])
             env[name+".K1"] = float(ee['K1'])
@@ -199,13 +199,12 @@ def elegant2xsuite_particles(elegant_ps, xtrack_line) :
     px = xp*p # TODO larger angle?
     py = yp*p # TODO larger angle?
     zeta = (t-t.mean())*_constants.c*xtrack_line.particle_ref.beta0[0]
-
     delta = (p-p.mean())/p.mean()
 
     particles = xtrack_line.build_particles(x=x,
-                                            xp=xp,
+                                            px=px,
                                             y=y,
-                                            yp=yp,
+                                            py=py,
                                             zeta=zeta,
                                             delta=delta)
 
@@ -219,7 +218,7 @@ def fbpic2xsuite(fbpic_dict) :
     '''Convert fbpic dict of particle arrays to xsuite'''
     pass
 
-def xsuite_Remove_DriftSlices(line ) :
+def xsuite_Remove_DriftSlices(line) :
     '''Replace DriftSlices for Drifts and create deferred variable'''
 
     for ename in line.element_names :
