@@ -315,3 +315,5 @@ def xsuite_CalculateBeamSize(line) :
         beam[k] = _np.array(beam[k])
 
     return beam
+
+## impressive new feature for Harry parks
