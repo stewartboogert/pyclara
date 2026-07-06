@@ -52,9 +52,9 @@ class Fbpic_runner:
     # output = f.track(elegant_output_h5)
     """
 
-    def __init__(self, outputdir):
+    def __init__(self, outputdir, diag_period = 0, use_cuda=False):
         # Simulation parameters
-        self.set_Sim_control()
+        self.set_Sim_control(use_cuda=use_cuda)
         # Plasma parameters
         self.set_plasma_density(1e22)  # Background plasma density [m^-3] (example value)
         self.get_lambda_p()
@@ -73,6 +73,7 @@ class Fbpic_runner:
         self.initialise_plasma()
         # Initialize Moving Window
         self.sim.set_moving_window(v=self.v_window)
+        self.period = diag_period
 
     # --------------------
     # Simulation parameters
@@ -369,7 +370,7 @@ class Fbpic_runner:
         """
         self.set_input_dict(input)
 
-    def run(self, diag_period = 0, fieldtype =["E", "rho"], extra_species = None):
+    def run(self, fieldtype =["E", "rho"], extra_species = None):
         """
         Run the FBPIC simulation with diagnostics.
 
@@ -387,6 +388,7 @@ class Fbpic_runner:
             Additional particle species to include in diagnostics,
             as {name: species} pairs. Default is None.
         """
+        diag_period = self.period
         if diag_period > 0:
             self.diag_period = diag_period
         else:
