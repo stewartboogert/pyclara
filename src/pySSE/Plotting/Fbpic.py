@@ -1,7 +1,9 @@
 import matplotlib.pyplot as plt
-import numpy as np 
+from matplotlib.colors import LinearSegmentedColormap, LogNorm
+import numpy as np
 import h5py
 from scipy.constants import c, e, m_e
+from scipy.stats import binned_statistic_2d
 
 def All(hdf5file,species): 
 
@@ -78,7 +80,7 @@ def Pz(hdf5file,species):
         plt.xlabel("$u_z$ (β·γ)")
         plt.ylabel("No. of macroparticles")
 
-def Wakefield_Ez(hdf5file,species):
+def Wakefield_Ez(hdf5file,plotname = "Wakefield_Ez", species = 'beam'):
     with h5py.File(hdf5file, 'r') as f:
         iteration = list(f["data"].keys())[0]
         attrs = f[f'data/{iteration}/fields/E'].attrs
@@ -100,7 +102,7 @@ def Wakefield_Ez(hdf5file,species):
         plt.colorbar(label='GV/m', pad=0.10)
         plt.xlabel('z (µm)');
         plt.ylabel('r (µm)');
-        plt.title('longitudinal wakefield')
+        plt.title(f'{plotname}', fontsize=18)
         original_ylim = plt.ylim()
         ax2 = plt.twinx()
         ax2.set_ylim(np.array(original_ylim) * scale / 1e9)
@@ -109,7 +111,7 @@ def Wakefield_Ez(hdf5file,species):
         plt.tight_layout()
         plt.show()
 
-def rho (hdf5file,species):
+def rho (hdf5file,plotname = "Electron Density", species = 'electrons'):
     with h5py.File(hdf5file, 'r') as f:
         iteration = list(f["data"].keys())[0]
         attrs = f[f'data/{iteration}/fields/E'].attrs
@@ -131,9 +133,115 @@ def rho (hdf5file,species):
         plt.colorbar(label='C/cm³')
         plt.xlabel('z (µm)');
         plt.ylabel('r (µm)');
-        plt.title('The electron density')
+        plt.title(f'{plotname}', fontsize=18)
         plt.tight_layout()
         plt.show()
+
+def plot_beam(hdf5file,plot_name = "Beam Density", species = 'beam'):
+    with h5py.File(hdf5file, 'r') as f:
+        iteration = list(f['data'].keys())[0]
+        p = f[f'data/{iteration}/particles/{species}']
+        x = p['position/x'][:]   # m
+        y = p['position/y'][:]   # m
+        z = p['position/z'][:]   # m
+        w = p['weighting'][:]    # physical particles per macroparticle
+        print(max(w), min(w), np.mean(w))
+
+        # rho field: openPMD thetaMode (m=0, m=1) -> components [mode0, m1_real, m1_imag]
+        rho_ds = f[f'data/{iteration}/fields/rho']
+        rho_modes = rho_ds[:]                         # (3, Nr, Nz)
+        dr, dz_f   = rho_ds.attrs['gridSpacing']
+        r0, z0     = rho_ds.attrs['gridGlobalOffset']
+        pos_r, pos_z = rho_ds.attrs['position']       # cell-centering (0.5, 0.5)
+        gunit      = rho_ds.attrs['gridUnitSI']
+        unitSI     = rho_ds.attrs['unitSI']
+        Nr, Nz = rho_modes.shape[1], rho_modes.shape[2]
+
+    mode0    = rho_modes[0]   # (Nr, Nz)
+    m1_real  = rho_modes[1]   # (Nr, Nz)
+
+    # Reconstruct rho in the x-z plane (y=0): theta=0 for x>0, theta=pi for x<0.
+    # The sin(theta) (imaginary) terms vanish on this plane, so only m1_real matters.
+    rho_xpos = (mode0 + m1_real) * unitSI   # x = +r
+    rho_xneg = (mode0 - m1_real) * unitSI   # x = -r
+
+    # radial / longitudinal cell-centered axes (m)
+    r_axis = (r0 + (np.arange(Nr) + pos_r) * dr) * gunit
+    z_axis = (z0 + (np.arange(Nz) + pos_z) * dz_f) * gunit
+
+    # build a full x axis from -r_max..+r_max and stack the field accordingly
+    x_field = np.concatenate([-r_axis[::-1], r_axis]) * 1e6          # µm
+    rho_field_xz = np.concatenate([rho_xneg[::-1, :], rho_xpos], axis=0)
+    z_field = z_axis * 1e6                                            # µm
+
+    # 2D weighted histogram in x-z (particle number density)
+    Nbins = 300
+    H, zedges, xedges = np.histogram2d(z, x, bins=Nbins, weights=w)
+
+    # bin volumes: dx * dz * Ly(x,z), local y-thickness per bin
+    dz = zedges[1] - zedges[0]
+    dx = xedges[1] - xedges[0]
+
+    # local y-extent in each (z,x) bin = max(y) - min(y) of the particles there
+    ymax, _, _, _ = binned_statistic_2d(z, x, y, statistic='max', bins=[zedges, xedges])
+    ymin, _, _, _ = binned_statistic_2d(z, x, y, statistic='min', bins=[zedges, xedges])
+    Ly_local = ymax - ymin        # m, NaN for empty bins, 0 for single-particle bins
+
+    bin_volume = dx * dz * Ly_local   # m³
+    good = np.isfinite(Ly_local) & (Ly_local > 0)
+
+    # number density [m^-3]
+    n = np.zeros_like(H)
+    n[good] = H[good] / bin_volume[good]
+    rho_cm3 = n / 1e6           # cm^-3
+
+    # Particles (lab frame) and the rho field grid (moving-window frame) can sit at
+    # very different absolute z at later iterations, so center each on its OWN z.
+    zc_um = np.average(z, weights=w) * 1e6
+    z_centers = 0.5 * (zedges[:-1] + zedges[1:]) * 1e6 - zc_um
+    x_centers = 0.5 * (xedges[:-1] + xedges[1:]) * 1e6
+
+    # field z centroid weighted by |charge| projected onto z
+    rho_proj = np.nansum(np.abs(rho_field_xz), axis=0)
+    zc_field = np.average(z_field, weights=rho_proj)
+    z_field = z_field - zc_field
+
+    fig, axes = plt.subplots(1, 2, figsize=(18, 4))
+
+    # log color scale anchored to where most of the density actually is:
+    # use percentiles of the populated bins so a few hot outliers don't eat the range
+    purple_red_yellow = LinearSegmentedColormap.from_list('black_purple_red_yellow', ['black', 'purple', 'red', 'yellow'])
+    pos = rho_cm3[np.isfinite(rho_cm3) & (rho_cm3 > 0)]
+    vmin0 = np.percentile(pos, 1)
+    vmax0 = np.percentile(pos, 99)
+    norm0 = LogNorm(vmin=vmin0, vmax=vmax0)
+    im0 = axes[0].pcolormesh(z_centers, x_centers, rho_cm3.T, cmap=purple_red_yellow, shading='auto', norm=norm0)
+    cb0 = fig.colorbar(im0, ax=axes[0], label=r'$n$ (cm$^{-3}$)')
+    cb0.set_label(r'$n$ (cm$^{-3}$)', fontsize=16)
+    cb0.ax.tick_params(labelsize=13)
+    axes[0].set_xlabel('z (µm)', fontsize=16)
+    axes[0].set_ylabel('x (µm)', fontsize=16)
+    axes[0].set_title(f'{plot_name}', fontsize=18)
+    axes[0].tick_params(labelsize=13)
+
+    # rho from HDF5 field, reconstructed in x-z, in C/cm³ (log scale)
+    rho_field_cm3 = rho_field_xz / 1e6 / -e
+    pos1 = rho_field_cm3[np.isfinite(rho_field_cm3) & (rho_field_cm3 > 0)]
+    vmin1 = np.percentile(pos1, 50)
+    vmax1 = np.percentile(pos1, 99)
+    norm1 = LogNorm(vmin=vmin1, vmax=vmax1)
+    im1 = axes[1].pcolormesh(z_field, x_field, rho_field_cm3, cmap='Reds', shading='auto', norm=norm1)
+    cb1 = fig.colorbar(im1, ax=axes[1], label='n (cm$^{-3}$)')
+    cb1.set_label('n (cm$^{-3}$)', fontsize=16)
+    cb1.ax.tick_params(labelsize=13)
+    axes[1].set_xlabel('z (µm)', fontsize=16)
+    axes[1].set_ylabel('x (µm)', fontsize=16)
+    axes[1].set_title('Electron density', fontsize=18)
+    axes[1].tick_params(labelsize=13)
+
+
+    plt.tight_layout()
+    plt.show()
 
 def phase_space(hdf5file,species):
     MeV = 1e6 * e
